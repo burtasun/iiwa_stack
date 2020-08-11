@@ -32,7 +32,7 @@
     
     <!-- Working with the real robot.  -->
     <!--<group ns="$(arg robot_name)" unless="$(arg sim)">-->
-        
+    <group unless="$(arg sim)">
         <!-- Load controllers accordingly to parameters -->
         <include file="$(find iiwa_control)/launch/iiwa_control.launch">
             <arg name="hardware_interface" value="$(arg hardware_interface)" />
@@ -46,7 +46,7 @@
             <arg name="hardware_interface" value="$(arg hardware_interface)" />
         </include>
         
-    <!--</group>-->
+    </group>
     
     <!-- Load move_group -->
     <!--<group ns="$(arg robot_name)">-->
