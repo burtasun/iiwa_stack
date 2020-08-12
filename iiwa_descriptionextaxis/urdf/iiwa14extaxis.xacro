@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="lortek_robot">
+
+  <link name="world" />
+  
+  <!--colores..-->
+  <xacro:include filename="$(find iiwa_description)/urdf/materials.xacro" />
+  <!--robot-->
+  <xacro:include filename="$(find iiwa_description)/urdf/iiwa14.xacro"/>
+  <xacro:arg name="hardware_interface" default="PositionJointInterface"/>
+  <xacro:arg name="robot_name" default="iiwa"/>
+  <xacro:arg name="robot_origin_xyz" default="0 0 0"/>
+  <xacro:arg name="robot_origin_rpy" default="0 0 0"/>
+  <xacro:arg name="origin_robot_to_axisplate" default="0 0 0"/>
+  <xacro:arg name="rpy_robot_to_axisplate" default="0 0 0"/>
+  
+  <xacro:iiwa14 hardware_interface="$(arg hardware_interface)" robot_name="$(arg robot_name)" parent="world">
+    <origin xyz="$(arg robot_origin_xyz)" rpy="$(arg robot_origin_rpy)" />
+  </xacro:iiwa14>
+
+  <!--EJE EXTERNO ROTATORIO-->
+    <link name="soporte"><!--postizo cosmetico-->
+      <visual>
+        <geometry>
+          <mesh filename="package://iiwa_descriptionextaxis/meshes/soporteplato.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+      </visual>
+    </link>
+    <link name="baseplato"/><!--base-->
+    <link name="plato"><!--plato rotado-->
+      <visual>
+        <geometry>
+          <mesh filename="package://iiwa_descriptionextaxis/meshes/plato.stl" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+      </visual>
+    </link>
+
+    <!--calibracion eje - robot-->
+    <joint name="world_to_baseplato" type="fixed">
+      <parent link="world"/>
+      <child link="baseplato"/>
+      <origin xyz="$(arg origin_robot_to_axisplate)" rpy="$(arg rpy_robot_to_axisplate)" />
+    </joint>
+    
+    <joint name="baseplato_to_plato" type="continuous"><!--sin finales de carrera-->
+      <parent link="baseplato"/>
+      <child link="plato"/>
+      <axis xyz="0 0 1"/>
+    </joint>
+
+    <joint name="baseplato_to_soporte" type="fixed">
+      <parent link="baseplato"/>
+      <child link="soporte"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+
+
+</robot>

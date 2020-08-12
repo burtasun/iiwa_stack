@@ -1,4 +1,4 @@
-#iiwa:
+iiwa:
   # Publish all joint states -----------------------------------
   joint_state_controller:
     type: joint_state_controller/JointStateController
@@ -135,7 +135,8 @@
     stop_trajectory_duration: 0        # Override default
     
   # Forward Position Controllers ---------------------------------------
-  PositionJointInterface_trajectory_controller:
+  #PositionJointInterface_trajectory_controller:
+  position_trajectory_controller:
     type: position_controllers/JointTrajectoryController
     joints: 
       - iiwa_joint_1

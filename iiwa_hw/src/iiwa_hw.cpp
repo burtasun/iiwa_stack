@@ -49,7 +49,7 @@ bool HardwareInterface::init(ros::NodeHandle& /*unused*/, ros::NodeHandle &robot
 
   robot_hw_nh.param("hardware_interface", interface_, std::string("PositionJointInterface"));
   robot_hw_nh.param("robot_name", robot_name_, std::string("iiwa"));
-
+  ROS_INFO("iiwa_hw --- initializing service and subscriptions");
   // Initialize Publishers and Subscribers from iiwa_ros.
   joint_position_state_.init(robot_name_);
   joint_torque_state_.init(robot_name_);
@@ -108,7 +108,7 @@ bool HardwareInterface::init(ros::NodeHandle& /*unused*/, ros::NodeHandle &robot
                         device_->joint_upper_limits[i], device_->joint_effort_limits[i]);
   }
 
-  ROS_INFO("Registering state and effort interfaces");
+  ROS_INFO("iiwa_hw --- Registering state and effort interfaces");
 
   // Register ros-controls interfaces.
   this->registerInterface(&state_interface_);

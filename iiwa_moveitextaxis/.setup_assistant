@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: iiwa_descriptionextaxis
+    relative_path: urdf/iiwa14extaxis.xacro
+    xacro_args: robot_name:=iiwa origin_robot_to_axisplate:="0.5 0.25 0" rpy_robot_to_axisplate:="0 0 3.1415926"
+  SRDF:
+    relative_path: config/lortek_robot.srdf
+  CONFIG:
+    author_name: Benat Urtasun
+    author_email: burtasun@lortek.es
+    generated_timestamp: 1597252561

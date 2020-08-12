@@ -125,6 +125,7 @@ public:
     std::vector<double> joint_effort_command{};
 
     void init() {
+      ROS_INFO_STREAM("iiwa_hw::HardwareInterface::ini");
       joint_position.resize(IIWA_JOINTS);
       joint_position_prev.resize(IIWA_JOINTS);
       joint_velocity.resize(IIWA_JOINTS);

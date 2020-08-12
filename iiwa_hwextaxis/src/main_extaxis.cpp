@@ -29,9 +29,11 @@
  */
 
 #include <ros/ros.h>
-#include <csignal>
+#include <controller_manager/controller_manager.h>
+#include <combined_robot_hw/combined_robot_hw.h>
+//#include "extaxis_hw.hpp"
 
-#include "iiwa_hw.hpp"
+#include <csignal>
 
 static bool quit{false};
 
@@ -39,7 +41,7 @@ void signalHandler(int /*unused*/) { quit = true; }
 
 int main(int argc, char** argv) {
   // Initialize ROS.
-  ros::init(argc, argv, "iiwa_hw", ros::init_options::NoSigintHandler);
+  ros::init(argc, argv, "iiwa_hwextaxis", ros::init_options::NoSigintHandler);
 
   // ROS spinner.
   ros::AsyncSpinner spinner(1);
@@ -49,22 +51,31 @@ int main(int argc, char** argv) {
   signal(SIGTERM, signalHandler);
   signal(SIGINT, signalHandler);
   signal(SIGHUP, signalHandler);
-
+  
   // Construct the LBR iiwa.
+  ROS_INFO_STREAM("Construyendo combined_robot_hw");
   ros::NodeHandle iiwa_nh;
-  ROS_INFO("iiwa_hw --- main.cpp building hw interface");
-  iiwa_hw::HardwareInterface iiwa_robot;
+  combined_robot_hw::CombinedRobotHW iiwa_ext_axis_robot;
+  
+  auto rosratesleep = ros::Rate{0.05};
+  ROS_INFO("extaxis --- esperando 20s");
+  rosratesleep.sleep();
 
   // Configuration routines.
-  iiwa_robot.init(iiwa_nh, iiwa_nh);
+  ROS_INFO_STREAM("extaxis --- iniciando combined_robot_hw");
+  iiwa_ext_axis_robot.init(iiwa_nh, iiwa_nh);
 
   ros::Time last(ros::Time::now());
   ros::Time now;
   ros::Duration period(1.0);
 
   // Controller manager.
-  controller_manager::ControllerManager manager(&iiwa_robot, iiwa_nh);
+  controller_manager::ControllerManager manager(&iiwa_ext_axis_robot, iiwa_nh);
+  
+  const double loopFreq = 50;
+  auto loopRate = ros::Rate{loopFreq};
 
+  ROS_INFO_STREAM("Iniciando nodo iiwa_hwextaxis con " << loopFreq << "hz de frecuencia");
   // Run as fast as possible.
   while (!quit) {
 
@@ -74,18 +85,18 @@ int main(int argc, char** argv) {
     last = now;
 
     // Read current robot position.
-    iiwa_robot.read(now, period);
+    iiwa_ext_axis_robot.read(now, period);
 
     // Update the controllers.
     manager.update(now, period);
 
     // send command position to the robot
-    iiwa_robot.write(now, period);
+    iiwa_ext_axis_robot.write(now, period);
 
     // wait for some milliseconds defined in controlFrequency
-    iiwa_robot.getRate().sleep();
+    loopRate.sleep();
   }
-
+  
   spinner.stop();
 
   return 0;

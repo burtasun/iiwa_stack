@@ -5,7 +5,7 @@
     
     <!-- | 		PARAMETERS  		| -->
     <!-- the "sim" argument controls whether we connect to a Simulated or Real robot. -->
-    <arg name="sim" default="true" doc="If true, the robot will be simulated in Gazebo" />
+    <arg name="sim" default="false" doc="If true, the robot will be simulated in Gazebo" />
     <!-- hardware_interface to use : PositionJointInterface, EffortJointInterface, VelocityJointInterface. -->
     <arg name="hardware_interface" default="PositionJointInterface"/>
     <!-- The is gonna have its nodes/topics under a namespace with the same name. -->
@@ -13,11 +13,12 @@
     <!-- Model of the iiwa to use : iiwa7, iiwa14 -->
     <arg name="model" default="iiwa14"/>
     <arg name="rviz" default="true" />
+    <arg name="extaxis" default="true" />
     
     <!--<remap from="/$(arg hardware_interface)_trajectory_controller/follow_joint_trajectory" 
-           to="/$(arg robot_name)/$(arg hardware_interface)_trajectory_controller/follow_joint_trajectory" />-->
-    <!--<remap from="robot_description" to="/$(arg robot_name)/robot_description" /> 
-    <remap from="/get_planning_scene" to="/$(arg robot_name)/get_planning_scene" /> -->
+           to="/$(arg robot_name)/$(arg hardware_interface)_trajectory_controller/follow_joint_trajectory" />
+    <remap from="robot_description" to="/$(arg robot_name)/robot_description" /> 
+    <remap from="/get_planning_scene" to="/$(arg robot_name)/get_planning_scene" />-->
     
     <!-- Run the robot within a Gazebo simulation. -->
     <group if="$(arg sim)">
@@ -39,12 +40,22 @@
             <arg name="controllers" value="joint_state_controller $(arg hardware_interface)_trajectory_controller" />
             <arg name="robot_name" value="$(arg robot_name)" />
             <arg name="model" value="$(arg model)" />
+            <arg name="extaxis" value="$(arg extaxis)" />
         </include>
         
         <!-- Robot interface -->
-        <include file="$(find iiwa_hw)/launch/iiwa_hw.launch" >
-            <arg name="hardware_interface" value="$(arg hardware_interface)" />
-        </include>
+        <group unless="$(arg extaxis)">
+            <include file="$(find iiwa_hw)/launch/iiwa_hw.launch" >
+                <arg name="hardware_interface" value="$(arg hardware_interface)" />
+            </include>
+        </group>
+        <group if="$(arg extaxis)">
+            <!--necesario para guiar la carga dinamica de hw interfaces-->
+            <rosparam file="$(find iiwa_hwextaxis)/config/robot_hardware.yaml" command="load" />
+            <include file="$(find iiwa_hwextaxis)/launch/iiwa_hwextaxis.launch" >
+                <arg name="hardware_interface" value="$(arg hardware_interface)" />
+            </include>
+        </group>
         
     </group>
     
